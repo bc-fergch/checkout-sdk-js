@@ -4,6 +4,7 @@ import { CheckoutButtonMethodType } from './strategies';
 import { AmazonPayV2ButtonInitializeOptions } from './strategies/amazon-pay-v2';
 import { ApplePayButtonInitializeOptions } from './strategies/apple-pay';
 import { BraintreePaypalV1ButtonInitializeOptions } from './strategies/braintree';
+import { BraintreeVenmoButtonInitializeOptions } from './strategies/braintree/braintree-venmo-button-options';
 import { GooglePayButtonInitializeOptions } from './strategies/googlepay';
 import { PaypalButtonInitializeOptions } from './strategies/paypal';
 import { PaypalCommerceButtonInitializeOptions } from './strategies/paypal-commerce';
@@ -42,6 +43,12 @@ export interface CheckoutButtonInitializeOptions extends CheckoutButtonOptions {
      * omitted unless you need to support Braintree Credit.
      */
     braintreepaypalcredit?: BraintreePaypalV1ButtonInitializeOptions;
+
+    /**
+     * The options that are required to facilitate Braintree Venmo. They can be
+     * omitted unless you need to support Braintree Venmo.
+     */
+    braintreevenmo?: BraintreeVenmoButtonInitializeOptions;
 
     /**
      * The options that are required to facilitate PayPal. They can be omitted
