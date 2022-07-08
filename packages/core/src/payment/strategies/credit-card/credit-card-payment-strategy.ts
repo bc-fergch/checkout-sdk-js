@@ -20,7 +20,7 @@ export default class CreditCardPaymentStrategy implements PaymentStrategy {
         protected _orderActionCreator: OrderActionCreator,
         protected _paymentActionCreator: PaymentActionCreator,
         protected _hostedFormFactory: HostedFormFactory,
-        private _formPoster?: FormPoster
+        protected _formPoster?: FormPoster
     ) {}
 
     execute(payload: OrderRequestBody, options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors> {
@@ -82,7 +82,7 @@ export default class CreditCardPaymentStrategy implements PaymentStrategy {
                     this._formPoster.postForm(response.body.next_action.data.url, { });
                 return this._store.dispatch(response)
             })
-
+    }
 
     protected _executeWithHostedForm(payload: OrderRequestBody, options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors>  {
         const { payment, ...order } = payload;
