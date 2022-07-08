@@ -1,4 +1,5 @@
 import { isNil, values } from 'lodash';
+import { FormPoster } from '@bigcommerce/form-poster';
 
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, NotInitializedError, NotInitializedErrorType } from '../../../common/error/errors';
@@ -18,7 +19,8 @@ export default class CreditCardPaymentStrategy implements PaymentStrategy {
         protected _store: CheckoutStore,
         protected _orderActionCreator: OrderActionCreator,
         protected _paymentActionCreator: PaymentActionCreator,
-        protected _hostedFormFactory: HostedFormFactory
+        protected _hostedFormFactory: HostedFormFactory,
+        private _formPoster?: FormPoster
     ) {}
 
     execute(payload: OrderRequestBody, options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors> {
@@ -76,7 +78,11 @@ export default class CreditCardPaymentStrategy implements PaymentStrategy {
         return this._store.dispatch(this._orderActionCreator.submitOrder(order, options))
             .then(() =>
                 this._store.dispatch(this._paymentActionCreator.submitPayment({ ...payment, paymentData }))
-            );
+            ).then(response => {
+                if(this._formPoster)
+                    this._formPoster.postForm(response.body.additional_action_required.data.redirect_url, { });
+                return response;
+            })
     }
 
     protected _executeWithHostedForm(payload: OrderRequestBody, options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors>  {

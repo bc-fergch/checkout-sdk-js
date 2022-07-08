@@ -1,7 +1,6 @@
 import { FormPoster } from '@bigcommerce/form-poster';
 
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
-import { RequestError } from '../../../common/error/errors';
 import { OrderActionCreator, OrderRequestBody } from '../../../order';
 import { OrderFinalizationNotRequiredError } from '../../../order/errors';
 import { PaymentArgumentInvalidError } from '../../errors';
@@ -31,9 +30,7 @@ export default class ExternalPaymentStrategy implements PaymentStrategy {
         try {
             return await this._store.dispatch(this._paymentActionCreator.submitPayment({...payment, paymentData}));
         } catch (error) {
-            if (!this._isAdditionalActionRequired(error)) {
-                return Promise.reject(error);
-            }
+            return Promise.reject(error);
 
             return new Promise(() => {
                 this._formPoster.postForm(error.body.additional_action_required.data.redirect_url, { });
@@ -53,11 +50,4 @@ export default class ExternalPaymentStrategy implements PaymentStrategy {
         return Promise.resolve(this._store.getState());
     }
 
-    private _isAdditionalActionRequired(error: RequestError): boolean {
-        const { additional_action_required, status } = error.body;
-
-        return status === 'additional_action_required'
-            && additional_action_required
-            && additional_action_required.type === 'offsite_redirect';
-    }
 }
