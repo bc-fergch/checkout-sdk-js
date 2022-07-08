@@ -76,14 +76,13 @@ export default class CreditCardPaymentStrategy implements PaymentStrategy {
         }
 
         return this._store.dispatch(this._orderActionCreator.submitOrder(order, options))
-            .then(() =>
-                this._store.dispatch(this._paymentActionCreator.submitPayment({ ...payment, paymentData }))
-            ).then(response => {
+            .then(() => this._paymentActionCreator.submitPayment({ ...payment, paymentData }))
+            .then(response => {
                 if(this._formPoster)
-                    this._formPoster.postForm(response.body.additional_action_required.data.redirect_url, { });
-                return response;
+                    this._formPoster.postForm(response.body.next_action.data.url, { });
+                return this._store.dispatch(response)
             })
-    }
+
 
     protected _executeWithHostedForm(payload: OrderRequestBody, options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors>  {
         const { payment, ...order } = payload;
